@@ -12,7 +12,7 @@ payload = {
             "content": "Explain an LLM KV cache in one sentence.",
         }
     ],
-    "temperature": 0
+    "temperature": 0,
 }
 
 body = json.dumps(payload).encode("utf-8")
@@ -25,7 +25,6 @@ with urlopen(request) as response:
 finished = time.perf_counter()
 
 result = json.loads(raw_response)
-
 answer = result["choices"][0]["message"]["content"]
 
 print(answer)
