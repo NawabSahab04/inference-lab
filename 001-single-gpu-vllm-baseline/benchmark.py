@@ -2,10 +2,10 @@ import json
 import time
 from urllib.request import Request, urlopen
 
-url = "http://127.0.0.1:8000/v1/chat/completions"
+url = "http://172.22.208.1:8000/v1/chat/completions"
 
 payload = {
-    "model": "/home/samrath/models/SmolLM2-360M-Instruct",
+    "model": "google/gemma-4-12b-qat",
     "messages": [
         {
             "role": "user",

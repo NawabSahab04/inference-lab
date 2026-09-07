@@ -10,3 +10,8 @@ My goal: learn to make language-model inference faster, cheaper, and more reliab
 Question: How fast can one user get a response from this model on my GPU?
 
 I do not know the answer yet.
+
+## Learning path
+
+See [ROADMAP.md](ROADMAP.md) for the one-year curriculum and
+[`002-streaming-latency`](002-streaming-latency) for the current Day 2 lab.
