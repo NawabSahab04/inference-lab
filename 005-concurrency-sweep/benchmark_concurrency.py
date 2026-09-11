@@ -22,7 +22,7 @@ def generate_payload(run):
             }
         ],
         "temperature": 0,
-        "max_tokens": 256,
+        "max_tokens": 64,
     }
 def run_request(request_id):
     # Build request
@@ -60,11 +60,6 @@ def run_request(request_id):
                     TTFT = time.perf_counter() - TTFT_start
                     ttft_done = 1
     elapsed = time.perf_counter() - TTFT_start
-    # Stream response
-    
-    # Measure TTFT and E2E
-    # Capture usage
-    # Return a dictionary of measurements
     return {
         "request_id": request_id,
         "TTFT": TTFT,
@@ -75,11 +70,57 @@ def run_request(request_id):
     }
 
 experiment_started = time.perf_counter()
+concurrency_levels = [1, 2, 4, 8]
+ttft_p50s, ttft_p95s, e2e_p50s, e2e_p95s, throughputs = [], [], [], [], []
+run_request("warmup")
+for concurrency in concurrency_levels:
+    conc_started = time.perf_counter()
+    print(f"Running benchmark with concurrency level: {concurrency}")
+    with ThreadPoolExecutor(max_workers=concurrency) as executor:
+        results = list(executor.map(run_request, range(20)))
+    print(f"Results for concurrency {concurrency}:")
+    ttfts = [result["TTFT"] for result in results]
+    elapsed_times = [result["elapsed"] for result in results]
+    total_tokens = sum(result["completion_tokens"] for result in results)
 
-with ThreadPoolExecutor(max_workers=2) as executor:
-    results = list(executor.map(run_request, range(2)))
+    aggregate_throughput = total_tokens / (time.perf_counter() - conc_started)
+    print(f"TTFTs: {ttfts}")
+    print(f"Elapsed times: {elapsed_times}")
+    print(f"Total tokens generated: {total_tokens}")
+    print(f"Aggregate throughput (tokens/sec): {aggregate_throughput:.2f}")
+    ttft_p50s.append(statistics.median(ttfts) * 1000)
+    ttft_p95s.append(sorted(ttfts)[math.ceil(len(ttfts) * 0.95) - 1] * 1000)
+    e2e_p50s.append(statistics.median(elapsed_times) * 1000)
+    e2e_p95s.append(sorted(elapsed_times)[math.ceil(len(elapsed_times) * 0.95) - 1] * 1000)
+    throughputs.append(aggregate_throughput)
 
-experiment_elapsed = time.perf_counter() - experiment_started
+plt.plot(concurrency_levels, throughputs, marker="o")
+plt.xlabel("Concurrency")
+plt.ylabel("Aggregate throughput (tokens/second)")
+plt.title("Concurrency vs aggregate throughput")
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig(OUTPUT_DIR / "concurrency_vs_throughput.png", dpi=160)
+plt.close()
 
-print(results)
-print(f"Experiment wall time: {experiment_elapsed:.3f} seconds")
+plt.plot(concurrency_levels, ttft_p50s, marker="o", label="TTFT p50")
+plt.plot(concurrency_levels, ttft_p95s, marker="o", label="TTFT p95")
+plt.xlabel("Concurrency")
+plt.ylabel("TTFT (ms)")
+plt.title("Concurrency vs time to first token")
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(OUTPUT_DIR / "concurrency_vs_ttft.png", dpi=160)
+plt.close()
+
+plt.plot(concurrency_levels, e2e_p50s, marker="o", label="E2E p50")
+plt.plot(concurrency_levels, e2e_p95s, marker="o", label="E2E p95")
+plt.xlabel("Concurrency")
+plt.ylabel("E2E latency (ms)")
+plt.title("Concurrency vs end-to-end latency")
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.savefig(OUTPUT_DIR / "concurrency_vs_e2e.png", dpi=160)
+plt.close()

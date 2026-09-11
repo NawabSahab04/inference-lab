@@ -14,4 +14,4 @@ I do not know the answer yet.
 ## Learning path
 
 See [ROADMAP.md](ROADMAP.md) for the one-year curriculum and
-[`002-streaming-latency`](002-streaming-latency) for the current Day 2 lab.
+[`005-concurrency-sweep`](005-concurrency-sweep) for the current lab.
