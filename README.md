@@ -14,4 +14,4 @@ I do not know the answer yet.
 ## Learning path
 
 See [ROADMAP.md](ROADMAP.md) for the one-year curriculum and
-[`005-concurrency-sweep`](005-concurrency-sweep) for the current lab.
+[`006-vram-kv-cache`](006-vram-kv-cache) for the current lab.
