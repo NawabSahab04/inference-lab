@@ -14,4 +14,4 @@ I do not know the answer yet.
 ## Learning path
 
 See [ROADMAP.md](ROADMAP.md) for the one-year curriculum and
-[`006-vram-kv-cache`](006-vram-kv-cache) for the current lab.
+[`007-week-one-report`](007-week-one-report) for the current lab.
